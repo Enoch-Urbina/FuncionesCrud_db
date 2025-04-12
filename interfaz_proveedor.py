@@ -8,30 +8,29 @@ from conexiondb import conectar
 conexion = conectar()
 cursor = conexion.cursor()
 
-def obtener_proveedores():
-    cursor.execute("SELECT * FROM proveedores")
+def obtener_proveedor():
+    cursor.execute("SELECT * FROM proveedor")
     return cursor.fetchall()
 
 def insertar_proveedor(nombre, telefono, email, direccion):
-    sql = "INSERT INTO proveedores (nombre, telefono, email, direccion) VALUES (%s, %s, %s, %s)"
+    sql = "INSERT INTO proveedor (nombre, telefono, email, direccion) VALUES (%s, %s, %s, %s)"
     cursor.execute(sql, (nombre, telefono, email, direccion))
     conexion.commit()
 
 def actualizar_proveedor(id_proveedor, nombre, telefono, email, direccion):
-    sql = "UPDATE proveedores SET nombre=%s, telefono=%s, email=%s, direccion=%s WHERE id_proveedor=%s"
+    sql = "UPDATE proveedor SET nombre=%s, telefono=%s, email=%s, direccion=%s WHERE id_proveedor=%s"
     cursor.execute(sql, (nombre, telefono, email, direccion, id_proveedor))
     conexion.commit()
 
 def eliminar_proveedor(id_proveedor):
-    cursor.execute("DELETE FROM proveedores WHERE id_proveedor=%s", (id_proveedor,))
+    cursor.execute("DELETE FROM proveedor WHERE id_proveedor=%s", (id_proveedor,))
     conexion.commit()
 
 app = QApplication(sys.argv)
 ventana = QWidget()
-ventana.setWindowTitle("Proveedores")
+ventana.setWindowTitle("Proveedor")
 layout = QVBoxLayout()
 
-# Entradas
 nombre_input = QLineEdit()
 telefono_input = QLineEdit()
 email_input = QLineEdit()
@@ -46,13 +45,11 @@ layout.addWidget(email_input)
 layout.addWidget(QLabel("Dirección:"))
 layout.addWidget(direccion_input)
 
-# Tabla
 tabla = QTableWidget()
 tabla.setColumnCount(5)
 tabla.setHorizontalHeaderLabels(["ID", "Nombre", "Teléfono", "Email", "Dirección"])
 layout.addWidget(tabla)
 
-# Botones
 boton_layout = QHBoxLayout()
 btn_agregar = QPushButton("Agregar")
 btn_actualizar = QPushButton("Actualizar")
@@ -62,10 +59,9 @@ boton_layout.addWidget(btn_actualizar)
 boton_layout.addWidget(btn_eliminar)
 layout.addLayout(boton_layout)
 
-# Funciones
 def cargar_tabla():
     tabla.setRowCount(0)
-    datos = obtener_proveedores()
+    datos = obtener_proveedor()
     for fila_idx, fila in enumerate(datos):
         tabla.insertRow(fila_idx)
         for col_idx, valor in enumerate(fila):
@@ -119,13 +115,11 @@ def cargar_datos_fila(fila, _):
     email_input.setText(tabla.item(fila, 3).text())
     direccion_input.setText(tabla.item(fila, 4).text())
 
-# Eventos
 btn_agregar.clicked.connect(agregar_proveedor)
 btn_actualizar.clicked.connect(actualizar_proveedor_ui)
 btn_eliminar.clicked.connect(eliminar_proveedor_ui)
 tabla.cellClicked.connect(cargar_datos_fila)
 
-# Mostrar ventana
 ventana.setLayout(layout)
 cargar_tabla()
 ventana.show()

@@ -1,37 +1,36 @@
-# interfaz_clientes.py
 import sys
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem, QMessageBox
 )
 from conexiondb import conectar
+
 conexion = conectar()
 cursor = conexion.cursor()
 
-def obtener_clientes():
-    cursor.execute("SELECT * FROM clientes")
+def obtener_cliente():
+    cursor.execute("SELECT * FROM cliente")
     return cursor.fetchall()
 
 def insertar_cliente(nombre, telefono, email, direccion):
-    sql = "INSERT INTO clientes (nombre, telefono, email, direccion) VALUES (%s, %s, %s, %s)"
+    sql = "INSERT INTO cliente (nombre, telefono, email, direccion) VALUES (%s, %s, %s, %s)"
     cursor.execute(sql, (nombre, telefono, email, direccion))
     conexion.commit()
 
 def actualizar_cliente(id_cliente, nombre, telefono, email, direccion):
-    sql = "UPDATE clientes SET nombre=%s, telefono=%s, email=%s, direccion=%s WHERE id_cliente=%s"
+    sql = "UPDATE cliente SET nombre=%s, telefono=%s, email=%s, direccion=%s WHERE id_cliente=%s"
     cursor.execute(sql, (nombre, telefono, email, direccion, id_cliente))
     conexion.commit()
 
 def eliminar_cliente(id_cliente):
-    cursor.execute("DELETE FROM clientes WHERE id_cliente=%s", (id_cliente,))
+    cursor.execute("DELETE FROM cliente WHERE id_cliente=%s", (id_cliente,))
     conexion.commit()
 
 app = QApplication(sys.argv)
 ventana = QWidget()
-ventana.setWindowTitle("Clientes")
+ventana.setWindowTitle("Cliente")
 layout = QVBoxLayout()
 
-# Campos de entrada
 nombre_input = QLineEdit()
 telefono_input = QLineEdit()
 email_input = QLineEdit()
@@ -46,13 +45,11 @@ layout.addWidget(email_input)
 layout.addWidget(QLabel("Dirección:"))
 layout.addWidget(direccion_input)
 
-# Tabla
 tabla = QTableWidget()
 tabla.setColumnCount(5)
 tabla.setHorizontalHeaderLabels(["ID", "Nombre", "Teléfono", "Email", "Dirección"])
 layout.addWidget(tabla)
 
-# Botones
 boton_layout = QHBoxLayout()
 btn_agregar = QPushButton("Agregar")
 btn_actualizar = QPushButton("Actualizar")
@@ -62,10 +59,9 @@ boton_layout.addWidget(btn_actualizar)
 boton_layout.addWidget(btn_eliminar)
 layout.addLayout(boton_layout)
 
-# Funciones
 def cargar_tabla():
     tabla.setRowCount(0)
-    datos = obtener_clientes()
+    datos = obtener_cliente()
     for fila_idx, fila in enumerate(datos):
         tabla.insertRow(fila_idx)
         for col_idx, valor in enumerate(fila):
@@ -119,15 +115,13 @@ def cargar_datos_fila(fila, _):
     email_input.setText(tabla.item(fila, 3).text())
     direccion_input.setText(tabla.item(fila, 4).text())
 
-# Eventos
 btn_agregar.clicked.connect(agregar_cliente)
 btn_actualizar.clicked.connect(actualizar_cliente_ui)
 btn_eliminar.clicked.connect(eliminar_cliente_ui)
 tabla.cellClicked.connect(cargar_datos_fila)
 
-# Mostrar ventana
 ventana.setLayout(layout)
 cargar_tabla()
 ventana.show()
-ventana.resize(800, 600) 
+ventana.resize(800, 600)
 sys.exit(app.exec())

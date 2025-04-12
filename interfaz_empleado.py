@@ -9,44 +9,50 @@ conexion = conectar()
 cursor = conexion.cursor()
 
 def obtener_empleados():
-    cursor.execute("SELECT * FROM empleados")
+    cursor.execute("SELECT * FROM empleado")
     return cursor.fetchall()
 
-def insertar_empleado(nombre, cargo):
-    sql = "INSERT INTO empleados (nombre, cargo) VALUES (%s, %s)"
-    cursor.execute(sql, (nombre, cargo))
+def insertar_empleado(nombre, telefono, email, direccion, puesto):
+    sql = "INSERT INTO empleado (nombre, telefono, email, direccion, puesto) VALUES (%s, %s, %s, %s, %s)"
+    cursor.execute(sql, (nombre, telefono, email, direccion, puesto))
     conexion.commit()
 
-def actualizar_empleado(id_empleado, nombre, cargo):
-    sql = "UPDATE empleados SET nombre=%s, cargo=%s WHERE id_empleado=%s"
-    cursor.execute(sql, (nombre, cargo, id_empleado))
+def actualizar_empleado(id_empleado, nombre, telefono, email, direccion, puesto):
+    sql = "UPDATE empleado SET nombre=%s, telefono=%s, email=%s, direccion=%s, puesto=%s WHERE id_empleado=%s"
+    cursor.execute(sql, (nombre, telefono, email, direccion, puesto, id_empleado))
     conexion.commit()
 
 def eliminar_empleado(id_empleado):
-    cursor.execute("DELETE FROM empleados WHERE id_empleado=%s", (id_empleado,))
+    cursor.execute("DELETE FROM empleado WHERE id_empleado=%s", (id_empleado,))
     conexion.commit()
 
 app = QApplication(sys.argv)
 ventana = QWidget()
-ventana.setWindowTitle("Empleados")
+ventana.setWindowTitle("Empleado")
 layout = QVBoxLayout()
 
-# Entradas
 nombre_input = QLineEdit()
-cargo_input = QLineEdit()
+telefono_input = QLineEdit()
+email_input = QLineEdit()
+direccion_input = QLineEdit()
+puesto_input = QLineEdit()
 
 layout.addWidget(QLabel("Nombre:"))
 layout.addWidget(nombre_input)
-layout.addWidget(QLabel("Cargo:"))
-layout.addWidget(cargo_input)
+layout.addWidget(QLabel("Teléfono:"))
+layout.addWidget(telefono_input)
+layout.addWidget(QLabel("Email:"))
+layout.addWidget(email_input)
+layout.addWidget(QLabel("Dirección:"))
+layout.addWidget(direccion_input)
+layout.addWidget(QLabel("Puesto:"))
+layout.addWidget(puesto_input)
 
-# Tabla
 tabla = QTableWidget()
-tabla.setColumnCount(3)
-tabla.setHorizontalHeaderLabels(["ID", "Nombre", "Cargo"])
+tabla.setColumnCount(6)
+tabla.setHorizontalHeaderLabels(["ID", "Nombre", "Teléfono", "Email", "Dirección", "Puesto"])
 layout.addWidget(tabla)
 
-# Botones
 boton_layout = QHBoxLayout()
 btn_agregar = QPushButton("Agregar")
 btn_actualizar = QPushButton("Actualizar")
@@ -56,7 +62,6 @@ boton_layout.addWidget(btn_actualizar)
 boton_layout.addWidget(btn_eliminar)
 layout.addLayout(boton_layout)
 
-# Funciones
 def cargar_tabla():
     tabla.setRowCount(0)
     datos = obtener_empleados()
@@ -67,12 +72,18 @@ def cargar_tabla():
 
 def limpiar_inputs():
     nombre_input.clear()
-    cargo_input.clear()
+    telefono_input.clear()
+    email_input.clear()
+    direccion_input.clear()
+    puesto_input.clear()
 
 def agregar_empleado():
     insertar_empleado(
         nombre_input.text(),
-        cargo_input.text()
+        telefono_input.text(),
+        email_input.text(),
+        direccion_input.text(),
+        puesto_input.text()
     )
     cargar_tabla()
     limpiar_inputs()
@@ -86,7 +97,10 @@ def actualizar_empleado_ui():
     actualizar_empleado(
         id_empleado,
         nombre_input.text(),
-        cargo_input.text()
+        telefono_input.text(),
+        email_input.text(),
+        direccion_input.text(),
+        puesto_input.text()
     )
     cargar_tabla()
     limpiar_inputs()
@@ -103,15 +117,16 @@ def eliminar_empleado_ui():
 
 def cargar_datos_fila(fila, _):
     nombre_input.setText(tabla.item(fila, 1).text())
-    cargo_input.setText(tabla.item(fila, 2).text())
+    telefono_input.setText(tabla.item(fila, 2).text())
+    email_input.setText(tabla.item(fila, 3).text())
+    direccion_input.setText(tabla.item(fila, 4).text())
+    puesto_input.setText(tabla.item(fila, 5).text())
 
-# Eventos
 btn_agregar.clicked.connect(agregar_empleado)
 btn_actualizar.clicked.connect(actualizar_empleado_ui)
 btn_eliminar.clicked.connect(eliminar_empleado_ui)
 tabla.cellClicked.connect(cargar_datos_fila)
 
-# Mostrar
 ventana.setLayout(layout)
 cargar_tabla()
 ventana.show()
