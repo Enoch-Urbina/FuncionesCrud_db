@@ -9,21 +9,21 @@ conexion = conectar()
 cursor = conexion.cursor()
 
 def obtener_categorias():
-    cursor.execute("SELECT * FROM categoria")
+    cursor.execute("SELECT * FROM categorias")
     return cursor.fetchall()
 
 def insertar_categoria(nombre):
-    sql = "INSERT INTO categoria (nombre) VALUES (%s)"
+    sql = "INSERT INTO categorias (nombre) VALUES (%s)"
     cursor.execute(sql, (nombre,))
     conexion.commit()
 
 def actualizar_categoria(id_categoria, nombre):
-    sql = "UPDATE categoria SET nombre=%s WHERE id_categoria=%s"
+    sql = "UPDATE categorias SET nombre=%s WHERE id_categoria=%s"
     cursor.execute(sql, (nombre, id_categoria))
     conexion.commit()
 
 def eliminar_categoria(id_categoria):
-    cursor.execute("DELETE FROM categoria WHERE id_categoria=%s", (id_categoria,))
+    cursor.execute("DELETE FROM categorias WHERE id_categoria=%s", (id_categoria,))
     conexion.commit()
 
 app = QApplication(sys.argv)
@@ -31,16 +31,18 @@ ventana = QWidget()
 ventana.setWindowTitle("Categorías")
 layout = QVBoxLayout()
 
+# Entradas
 nombre_input = QLineEdit()
-
 layout.addWidget(QLabel("Nombre:"))
 layout.addWidget(nombre_input)
 
+# Tabla
 tabla = QTableWidget()
 tabla.setColumnCount(2)
 tabla.setHorizontalHeaderLabels(["ID", "Nombre"])
 layout.addWidget(tabla)
 
+# Botones
 boton_layout = QHBoxLayout()
 btn_agregar = QPushButton("Agregar")
 btn_actualizar = QPushButton("Actualizar")
@@ -50,6 +52,7 @@ boton_layout.addWidget(btn_actualizar)
 boton_layout.addWidget(btn_eliminar)
 layout.addLayout(boton_layout)
 
+# Funciones
 def cargar_tabla():
     tabla.setRowCount(0)
     datos = obtener_categorias()
@@ -89,11 +92,13 @@ def eliminar_categoria_ui():
 def cargar_datos_fila(fila, _):
     nombre_input.setText(tabla.item(fila, 1).text())
 
+# Eventos
 btn_agregar.clicked.connect(agregar_categoria)
 btn_actualizar.clicked.connect(actualizar_categoria_ui)
 btn_eliminar.clicked.connect(eliminar_categoria_ui)
 tabla.cellClicked.connect(cargar_datos_fila)
 
+# Mostrar
 ventana.setLayout(layout)
 cargar_tabla()
 ventana.show()
