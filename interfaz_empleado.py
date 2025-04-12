@@ -12,14 +12,14 @@ def obtener_empleados():
     cursor.execute("SELECT * FROM empleado")
     return cursor.fetchall()
 
-def insertar_empleado(nombre, telefono, email, direccion, puesto):
-    sql = "INSERT INTO empleado (nombre, telefono, email, direccion, puesto) VALUES (%s, %s, %s, %s, %s)"
-    cursor.execute(sql, (nombre, telefono, email, direccion, puesto))
+def insertar_empleado(nombre, puesto):
+    sql = "INSERT INTO empleado (nombre, puesto) VALUES (%s, %s)"
+    cursor.execute(sql, (nombre, puesto))
     conexion.commit()
 
-def actualizar_empleado(id_empleado, nombre, telefono, email, direccion, puesto):
-    sql = "UPDATE empleado SET nombre=%s, telefono=%s, email=%s, direccion=%s, puesto=%s WHERE id_empleado=%s"
-    cursor.execute(sql, (nombre, telefono, email, direccion, puesto, id_empleado))
+def actualizar_empleado(id_empleado, nombre, puesto):
+    sql = "UPDATE empleado SET nombre=%s, puesto=%s WHERE id_empleado=%s"
+    cursor.execute(sql, (nombre, puesto, id_empleado))
     conexion.commit()
 
 def eliminar_empleado(id_empleado):
@@ -28,29 +28,20 @@ def eliminar_empleado(id_empleado):
 
 app = QApplication(sys.argv)
 ventana = QWidget()
-ventana.setWindowTitle("Empleado")
+ventana.setWindowTitle("Empleados")
 layout = QVBoxLayout()
 
 nombre_input = QLineEdit()
-telefono_input = QLineEdit()
-email_input = QLineEdit()
-direccion_input = QLineEdit()
 puesto_input = QLineEdit()
 
 layout.addWidget(QLabel("Nombre:"))
 layout.addWidget(nombre_input)
-layout.addWidget(QLabel("Teléfono:"))
-layout.addWidget(telefono_input)
-layout.addWidget(QLabel("Email:"))
-layout.addWidget(email_input)
-layout.addWidget(QLabel("Dirección:"))
-layout.addWidget(direccion_input)
 layout.addWidget(QLabel("Puesto:"))
 layout.addWidget(puesto_input)
 
 tabla = QTableWidget()
-tabla.setColumnCount(6)
-tabla.setHorizontalHeaderLabels(["ID", "Nombre", "Teléfono", "Email", "Dirección", "Puesto"])
+tabla.setColumnCount(3)
+tabla.setHorizontalHeaderLabels(["ID", "Nombre", "Puesto"])
 layout.addWidget(tabla)
 
 boton_layout = QHBoxLayout()
@@ -72,19 +63,10 @@ def cargar_tabla():
 
 def limpiar_inputs():
     nombre_input.clear()
-    telefono_input.clear()
-    email_input.clear()
-    direccion_input.clear()
     puesto_input.clear()
 
 def agregar_empleado():
-    insertar_empleado(
-        nombre_input.text(),
-        telefono_input.text(),
-        email_input.text(),
-        direccion_input.text(),
-        puesto_input.text()
-    )
+    insertar_empleado(nombre_input.text(), puesto_input.text())
     cargar_tabla()
     limpiar_inputs()
 
@@ -94,14 +76,7 @@ def actualizar_empleado_ui():
         QMessageBox.warning(ventana, "Advertencia", "Selecciona un empleado para actualizar.")
         return
     id_empleado = int(tabla.item(fila, 0).text())
-    actualizar_empleado(
-        id_empleado,
-        nombre_input.text(),
-        telefono_input.text(),
-        email_input.text(),
-        direccion_input.text(),
-        puesto_input.text()
-    )
+    actualizar_empleado(id_empleado, nombre_input.text(), puesto_input.text())
     cargar_tabla()
     limpiar_inputs()
 
@@ -117,10 +92,7 @@ def eliminar_empleado_ui():
 
 def cargar_datos_fila(fila, _):
     nombre_input.setText(tabla.item(fila, 1).text())
-    telefono_input.setText(tabla.item(fila, 2).text())
-    email_input.setText(tabla.item(fila, 3).text())
-    direccion_input.setText(tabla.item(fila, 4).text())
-    puesto_input.setText(tabla.item(fila, 5).text())
+    puesto_input.setText(tabla.item(fila, 2).text())
 
 btn_agregar.clicked.connect(agregar_empleado)
 btn_actualizar.clicked.connect(actualizar_empleado_ui)
